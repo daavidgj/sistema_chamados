@@ -1,8 +1,17 @@
 import Funcionario from "../model/Funcionario.js";
+import Empresa from "../model/Empresa.js";
 
-async function index(req, res) { }
+async function index(req, res) {
+    const empresa = await Empresa.find({ _id: req.params.idEmpresa });
+    const funcionarios = await Funcionario.find({ idEmpresa: req.params.idEmpresa });
+    const response = { Informações: { empresa: empresa, funcionarios: funcionarios } };
+    res.status(200).json({ mensagem: "Listar Funcionarios", response });
+}
 
-async function show(req, res) { }
+async function show(req, res) {
+    const funcionario = await Funcionario.findById(req.user.id).populate('idEmpresa');
+    res.status(200).json({ mensagem: "Dados do Funcionario", funcionario: funcionario });
+}
 async function store(req, res) {
     console.log('Dados', req.body);
     try {
