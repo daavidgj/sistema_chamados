@@ -1,5 +1,6 @@
 import Funcionario from "../model/Funcionario.js";
 import Empresa from "../model/Empresa.js";
+import yupFuncionario from "../middleware/yup/yupFuncionario.js";
 
 async function index(req, res) {
     const empresa = await Empresa.find({ _id: req.params.idEmpresa });
@@ -15,6 +16,7 @@ async function show(req, res) {
 async function store(req, res) {
     console.log('Dados', req.body);
     try {
+        await yupFuncionario.yupStore.validate(req.body);
         const funcionario = await Funcionario.create({ ...req.body, idEmpresa: req.params.idEmpresa });
         res.status(201).json({ mensagem: "Funcionario cadastrado com sucesso!", funcionario: funcionario });
 
@@ -24,6 +26,7 @@ async function store(req, res) {
 }
 async function update(req, res) {
     try {
+        await yupFuncionario.yupUpdate.validate(req.body);
         const funcionarioAtualizado = await Funcionario.findByIdAndUpdate(req.user.id, req.body, { new: true });
         res.status(200).json({ mensagem: "Funcionario atualizado com sucesso!", funcionarioAtualizado: funcionarioAtualizado });
     } catch (error) {

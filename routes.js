@@ -1,5 +1,6 @@
 
 import { Router } from "express";
+import yup from "yup";
 //Controller
 import adminController from "./controller/adminController.js";
 import loginController from "./controller/loginController.js";
@@ -13,9 +14,11 @@ import logController from "./controller/logController.js";
 import authenticateToken from "./middleware/authentication.js";
 import authenticateTokenAdmin from "./middleware/authenticationAdmin.js";
 import authenticateTokenSuporte from "./middleware/auth/authenticationSuporte.js";
+import authenticateTokenFuncionario from "./middleware/auth/authenticationFuncionario.js";
 import validateEmpresa from "./middleware/validateEmpresa.js";
 import validateChamadoStatus from "./middleware/chamado/validateChamadoStatus.js";
 import validateChamado from "./middleware/chamado/validateChamado.js";
+import isAuthor from "./middleware/isAuthor.js";
 
 import validateFuncionario from "./middleware/validateFuncionario.js";
 
@@ -42,10 +45,10 @@ routerAdmin.delete("/perfil/deletar", authenticateToken, adminController.destroy
 
 //Empresa
 routerEmpresa.get("/", authenticateToken, empresaController.index)
-routerEmpresa.get("/dados/:id", authenticateToken, empresaController.show)
+routerEmpresa.get("/dados/:idEmpresa", authenticateToken, empresaController.show)
 routerEmpresa.post("/cadastro", authenticateToken, empresaController.store)
-routerEmpresa.put("/editar/:id", authenticateToken, empresaController.update)
-routerEmpresa.delete("/deletar/:id", authenticateToken, empresaController.destroy)
+routerEmpresa.put("/editar/:idEmpresa", authenticateTokenAdmin, isAuthor, empresaController.update)
+routerEmpresa.delete("/deletar/:idEmpresa", authenticateToken, empresaController.destroy)
 
 //Functionario
 routerFuncionario.get("/:idEmpresa/funcionario/all", authenticateTokenAdmin, validateEmpresa, funcionarioController.index)
@@ -58,13 +61,13 @@ routerFuncionario.delete("/:idEmpresa/funcionario", authenticateToken, validateE
 routerSuporte.get("/:idEmpresa/suporte/all", authenticateTokenAdmin, validateEmpresa, suporteController.index)
 routerSuporte.get("/:idEmpresa/suporte", authenticateToken, validateEmpresa, suporteController.show)
 routerSuporte.post("/:idEmpresa/suporte/cadastro", authenticateTokenAdmin, validateEmpresa, suporteController.store)
-routerSuporte.put("/:idEmpresa/suporte", authenticateToken, validateEmpresa, suporteController.update)
+routerSuporte.put("/:idEmpresa/suporte", authenticateTokenSuporte, validateEmpresa, suporteController.update)
 routerSuporte.delete("/:idEmpresa/suporte", authenticateToken, validateEmpresa, suporteController.destroy)
 
 //Chamado
-routerChamado.get("/:idEmpresa/chamado/all", authenticateToken, validateEmpresa, chamadoController.index)
+routerChamado.get("/:idEmpresa/chamado/all", authenticateTokenSuporte, validateEmpresa, chamadoController.index)
 routerChamado.get("/:idEmpresa/chamado/:idChamado", authenticateToken, validateEmpresa, chamadoController.show)
-routerChamado.post("/:idEmpresa/chamado/cadastro", authenticateToken, validateEmpresa, chamadoController.store)
+routerChamado.post("/:idEmpresa/chamado/cadastro", authenticateTokenFuncionario, validateEmpresa, chamadoController.store)
 routerChamado.put("/:idEmpresa/chamado/:idChamado", authenticateTokenSuporte, validateEmpresa, validateChamado, validateChamadoStatus, chamadoController.update)
 routerChamado.delete("/:idEmpresa/chamado/:idChamado", authenticateToken, validateEmpresa, chamadoController.destroy)
 

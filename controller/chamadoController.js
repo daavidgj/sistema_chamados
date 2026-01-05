@@ -3,6 +3,8 @@ import Empresa from "../model/Empresa.js";
 import Funcionario from "../model/Funcionario.js";
 import Suporte from "../model/Suporte.js";
 import createLog from "../middleware/logs/createLog.js";
+import yupChamado from "../middleware/yup/yupChamado.js";
+import yup from 'yup';
 
 async function index(req, res) {
     try {
@@ -23,6 +25,7 @@ async function show(req, res) {
 }
 async function store(req, res) {
     try {
+        await yupChamado.yupStore.validate(req.body);
         const chamado = await Chamado.create({ ...req.body, idEmpresa: req.params.idEmpresa, idFuncionario: req.user.id });
         await createLog({
             action: `Chamado '${chamado.titulo}' cadastrado por '${req.user.nome}'`,
@@ -32,11 +35,15 @@ async function store(req, res) {
         });
         res.status(201).json({ mensagem: "Chamado cadastrado com sucesso!", chamado: chamado });
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            return res.status(400).json({ mensagem: error.message });
+        }
         res.status(400).json({ mensagem: "Erro ao cadastrar", error: error.message });
     }
 }
 async function update(req, res) {
     try {
+        await yupChamado.yupUpdate.validate(req.body);
         const chamadoAntigo = await Chamado.findById(req.params.idChamado);
         const chamado = await Chamado.findByIdAndUpdate(req.params.idChamado, req.body, { new: true, runValidators: true });
         console.log('User ativo', req.user);
@@ -50,6 +57,9 @@ async function update(req, res) {
         });
         res.status(200).json({ mensagem: "Chamado atualizado com sucesso!", chamadoAtualizado: chamado });
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            return res.status(400).json({ mensagem: error.message });
+        }
         res.status(400).json({ mensagem: "Erro ao atualizar", error: error.message });
     }
 
