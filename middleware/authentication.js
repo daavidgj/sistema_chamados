@@ -8,10 +8,9 @@ const authenticateToken = async (req, res, next) => {
     if (token) {
         try {
 
-            jwt.verify(token, SECRET_KEY, (error, u) => {
-                if (error) return res.status(401).json({ message: 'Token inválido', error: error.message });
-                req.user = u;
-            })
+            const decoded = jwt.verify(token, SECRET_KEY);
+            req.user = decoded;
+
             const admin = await Admin.findById(req.user.id);
             const funcionario = await Funcionario.findById(req.user.id);
             const suporte = await Suporte.findById(req.user.id);
@@ -24,7 +23,7 @@ const authenticateToken = async (req, res, next) => {
             res.status(401).json({ message: 'Token inválido', error: error.message });
         }
     } else {
-        res.status(401).json({ message: 'Token inválido' });
+        return res.status(401).json({ message: 'Token inválido, não foi encontrado no header' });
     }
 }
 

@@ -5,13 +5,18 @@ import yupFuncionario from "../middleware/yup/yupFuncionario.js";
 async function index(req, res) {
     const empresa = await Empresa.find({ _id: req.params.idEmpresa });
     const funcionarios = await Funcionario.find({ idEmpresa: req.params.idEmpresa });
-    const response = { Informações: { empresa: empresa, funcionarios: funcionarios } };
-    res.status(200).json({ mensagem: "Listar Funcionarios", response });
+    const response = { empresa: empresa, funcionarios: funcionarios };
+    res.status(200).json({ mensagem: "Listar Funcionarios", Informações: response });
 }
 
 async function show(req, res) {
-    const funcionario = await Funcionario.findById(req.user.id).populate('idEmpresa');
-    res.status(200).json({ mensagem: "Dados do Funcionario", funcionario: funcionario });
+    try {
+        const funcionario = await Funcionario.findById(req.user.id).populate('idEmpresa');
+        res.status(200).json({ mensagem: "Dados do Funcionario", funcionario: funcionario });
+
+    } catch (error) {
+        res.status(400).json({ mensagem: "Erro ao buscar", error: error.message });
+    }
 }
 async function store(req, res) {
     console.log('Dados', req.body);

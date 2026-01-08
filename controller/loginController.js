@@ -18,9 +18,18 @@ async function store(req, res) {
         const userDados = adminDados || funcionarioDados || suporteDados;
 
         if (!userDados) return res.status(401).json({ mensagem: "Usuário ou senha inválidos" });
-        const token = jwt.sign({ id: userDados._id, email: userDados.email, role: userDados.role, nome: userDados.nome }, SECRET_KEY/*, { expiresIn: '1h' }*/);
-        const roleAcess = userDados.role;
-        return res.status(200).json({ mensagem: "Autenticado com sucesso como " + roleAcess, token: token });
+        console.log('userDados', userDados);
+        if (userDados.role === "admin") {
+            const token = jwt.sign({ id: userDados._id, email: userDados.email, role: userDados.role, nome: userDados.nome }, SECRET_KEY/*, { expiresIn: '1h' }*/);
+            const roleAcess = userDados.role;
+            return res.status(200).json({ mensagem: "Autenticado com sucesso como " + roleAcess, token: token });
+        }
+        if (userDados.role !== "admin") {
+            const token = jwt.sign({ id: userDados._id, email: userDados.email, role: userDados.role, nome: userDados.nome, idEmpresa: userDados.idEmpresa }, SECRET_KEY/*, { expiresIn: '1h' }*/);
+            const roleAcess = userDados.role;
+            return res.status(200).json({ mensagem: "Autenticado com sucesso como " + roleAcess, token: token });
+
+        }
 
     } catch (error) {
         if (error instanceof yup.ValidationError) {

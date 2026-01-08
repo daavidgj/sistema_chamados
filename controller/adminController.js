@@ -1,4 +1,5 @@
 import Admin from "../model/Admin.js";
+import Empresa from "../model/Empresa.js";
 import yupAdmin from "../middleware/yup/yupAdmin.js";
 
 import yup from "yup";
@@ -9,11 +10,11 @@ async function index(req, res) {
 }
 
 async function show(req, res) {
-    console.log('dados req user', req.user);
-
     try {
-        const admin = req.user;
-        return res.status(200).json({ mensagem: "Dados do Administrador", admin: admin });
+        const admin = await Admin.findById(req.user.id);
+        const empresa = await Empresa.find({ idAdmin: req.user.id });
+        const response = { admin: admin, empresas: empresa };
+        return res.status(200).json({ mensagem: "Dados do Administrador", Informações: response });
 
     } catch (error) {
         return res.status(400).json({ mensagem: "Erro ao buscar", error: error.message });
@@ -40,6 +41,9 @@ async function update(req, res) {
         const adminAtualizado = await Admin.findByIdAndUpdate(req.user.id, req.body, { new: true });
         return res.status(200).json({ mensagem: "Administrador atualizado com sucesso!", adminAtualizado: adminAtualizado });
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            return res.status(400).json({ mensagem: error.message });
+        }
         return res.status(400).json({ mensagem: "Erro ao atualizar", error: error.message });
     }
 

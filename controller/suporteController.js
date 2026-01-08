@@ -6,12 +6,18 @@ import yup from "yup";
 async function index(req, res) {
     const empresa = await Empresa.find({ _id: req.params.idEmpresa });
     const suportes = await Suporte.find({ idEmpresa: req.params.idEmpresa });
-    const response = { Informações: { empresa: empresa, suportes: suportes } };
-    res.status(200).json({ mensagem: "Listar Suportes", response });
+    const response = { empresa: empresa, suportes: suportes };
+    res.status(200).json({ mensagem: "Listar Suportes", Informações: response });
 }
 async function show(req, res) {
-    const suporte = await Suporte.findById(req.user.id).populate('idEmpresa');
-    res.status(200).json({ mensagem: "Dados do Suporte", suporte: suporte });
+    try {
+
+        const suporte = await Suporte.findById(req.user.id).populate('idEmpresa');
+        res.status(200).json({ mensagem: "Dados do Suporte", suporte: suporte });
+
+    } catch (error) {
+        res.status(400).json({ mensagem: "Erro ao buscar", error: error.message });
+    }
 
 }
 async function store(req, res) {

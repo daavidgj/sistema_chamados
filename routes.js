@@ -37,40 +37,43 @@ const routerLog = Router();
 
 routerLogin.post("/", loginController.store)
 //Admin
-routerAdmin.get("/", authenticateToken, adminController.index)
-routerAdmin.get("/perfil", authenticateToken, adminController.show)
+routerAdmin.get("/", authenticateToken, adminController.show)
 routerAdmin.post("/cadastro", adminController.store)
-routerAdmin.put("/perfil/editar", authenticateToken, adminController.update)
-routerAdmin.delete("/perfil/deletar", authenticateToken, adminController.destroy)
+routerAdmin.put("/editar", authenticateToken, adminController.update)
+routerAdmin.delete("/deletar", authenticateToken, adminController.destroy)
 
 //Empresa
 routerEmpresa.get("/", authenticateToken, empresaController.index)
-routerEmpresa.get("/dados/:idEmpresa", authenticateToken, empresaController.show)
+routerEmpresa.get("/detalhes/:idEmpresa", authenticateToken, isAuthor, empresaController.show)
 routerEmpresa.post("/cadastro", authenticateToken, empresaController.store)
 routerEmpresa.put("/editar/:idEmpresa", authenticateTokenAdmin, isAuthor, empresaController.update)
-routerEmpresa.delete("/deletar/:idEmpresa", authenticateToken, empresaController.destroy)
+routerEmpresa.delete("/deletar/:idEmpresa", authenticateToken, isAuthor, empresaController.destroy)
 
-//Functionario
-routerFuncionario.get("/:idEmpresa/funcionario/all", authenticateTokenAdmin, validateEmpresa, funcionarioController.index)
-routerFuncionario.get("/:idEmpresa/funcionario", authenticateToken, validateEmpresa, funcionarioController.show)
-routerFuncionario.post("/:idEmpresa/funcionario/cadastro", authenticateTokenAdmin, validateEmpresa, funcionarioController.store)
-routerFuncionario.put("/:idEmpresa/funcionario", authenticateToken, validateEmpresa, funcionarioController.update)
-routerFuncionario.delete("/:idEmpresa/funcionario", authenticateToken, validateEmpresa, funcionarioController.destroy)
+//Funcionario
+routerFuncionario.get("/:idEmpresa/funcionario/all", authenticateTokenAdmin, validateEmpresa, isAuthor, funcionarioController.index)//Admin
+routerFuncionario.get("/funcionario", authenticateTokenFuncionario, funcionarioController.show)
+routerFuncionario.post("/:idEmpresa/funcionario/cadastro", authenticateTokenAdmin, validateEmpresa, isAuthor, funcionarioController.store)
+routerFuncionario.put("/funcionario", authenticateTokenFuncionario, validateEmpresa, validateFuncionario, funcionarioController.update)
+routerFuncionario.delete("/funcionario", authenticateToken, validateEmpresa, funcionarioController.destroy)
 
 //Suporte
-routerSuporte.get("/:idEmpresa/suporte/all", authenticateTokenAdmin, validateEmpresa, suporteController.index)
-routerSuporte.get("/:idEmpresa/suporte", authenticateToken, validateEmpresa, suporteController.show)
-routerSuporte.post("/:idEmpresa/suporte/cadastro", authenticateTokenAdmin, validateEmpresa, suporteController.store)
-routerSuporte.put("/:idEmpresa/suporte", authenticateTokenSuporte, validateEmpresa, suporteController.update)
-routerSuporte.delete("/:idEmpresa/suporte", authenticateToken, validateEmpresa, suporteController.destroy)
+routerSuporte.get("/:idEmpresa/suporte/all", authenticateTokenAdmin, validateEmpresa, isAuthor, suporteController.index)//Admin
+routerSuporte.get("/suporte", authenticateTokenSuporte, validateEmpresa, suporteController.show)
+routerSuporte.post("/:idEmpresa/suporte/cadastro", authenticateTokenAdmin, validateEmpresa, isAuthor, suporteController.store)
+routerSuporte.put("/suporte", authenticateTokenSuporte, validateEmpresa, suporteController.update)
+routerSuporte.delete("/suporte", authenticateTokenSuporte, validateEmpresa, suporteController.destroy)
 
 //Chamado
 routerChamado.get("/:idEmpresa/chamado/all", authenticateTokenSuporte, validateEmpresa, chamadoController.index)
-routerChamado.get("/:idEmpresa/chamado/:idChamado", authenticateToken, validateEmpresa, chamadoController.show)
-routerChamado.post("/:idEmpresa/chamado/cadastro", authenticateTokenFuncionario, validateEmpresa, chamadoController.store)
-routerChamado.put("/:idEmpresa/chamado/:idChamado", authenticateTokenSuporte, validateEmpresa, validateChamado, validateChamadoStatus, chamadoController.update)
-routerChamado.delete("/:idEmpresa/chamado/:idChamado", authenticateToken, validateEmpresa, chamadoController.destroy)
+routerChamado.get("/chamado/:idChamado", authenticateToken, validateEmpresa, chamadoController.show)
+routerChamado.post("/chamado/cadastro", authenticateTokenFuncionario, validateEmpresa, chamadoController.store)
+routerChamado.put("/chamado/:idChamado", authenticateTokenSuporte, validateEmpresa, validateChamado, validateChamadoStatus, chamadoController.update)
+routerChamado.delete("/chamado/:idChamado", authenticateTokenFuncionario, validateEmpresa, chamadoController.destroy)
+/* 
 
+Ajeitar acesso nos chamados
+
+*/
 //Log
 routerLog.get("/:idEmpresa/log/all", authenticateToken, logController.index)
 routerLog.get("/:idEmpresa/log/:idChamado", authenticateToken, logController.show)

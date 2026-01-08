@@ -4,8 +4,8 @@ const suporteSchema = new mongoose.Schema({
     nome: { type: String, required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    role: { type: String, default: "suporte" },
-    idEmpresa: { type: mongoose.Schema.Types.ObjectId, ref: "Empresa" }
+    role: { type: String, default: "suporte", immutable: true },
+    idEmpresa: { type: mongoose.Schema.Types.ObjectId, ref: "Empresa", immutable: true }
 })
 
 export default mongoose.model("Suporte", suporteSchema);

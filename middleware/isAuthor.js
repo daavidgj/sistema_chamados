@@ -9,12 +9,14 @@ const isAuthor = async (req, res, next) => {
         const suporte = await Suporte.findById(req.user.id);
         const admin = await Admin.findById(req.user.id);
 
+
         const userLogado = admin || funcionario || suporte;
         if (!userLogado) return res.status(401).json({ message: 'Não autorizado' });
-        if (admin) {
+        if (userLogado.role === "admin") {
             try {
+
                 const empresa = await Empresa.findById(req.params.idEmpresa);
-                if (empresa.idAdmin.toString() !== admin._id.toString()) {
+                if (empresa.idAdmin != userLogado._id.toString()) {
                     return res.status(401).json({ message: 'Esta empresa pertence a outro usuário' });
                 }
 
